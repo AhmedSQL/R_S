@@ -1,0 +1,57 @@
+
+# Install  the required library  
+
+install.packages("caret")
+install.packages("e1071")
+
+
+
+
+# Load the required library
+
+library(caret)
+library(e1071)
+
+
+#Load dataset
+
+log2<- read.csv("C:\Users\Ahmed Hashim\Desktop\log2.csv")
+
+View(log2)
+
+
+# create a list of 80% of the rows in the original dataset we can use for training
+
+divide_data <- createDataPartition(log2$Action, p=0.80, list=FALSE)
+# select 20% of the data for validation
+test <- log2[-divide_data,]
+# use the remaining 80% of data to training and testing the models
+train <- log2[divide_data,]
+
+
+#Build  CART decision tree algorithm/ model using train dataset
+
+set.seed(7)
+fit.cart <- train(Action~., data=train, method="rpart")
+
+# summarize   Model
+
+print(fit.cart)
+
+
+# estimate skill of CART on the training dataset
+
+predictions <- predict(fit.cart, train)
+confusionMatrix(predictions, as.factor(train$Action))
+
+# estimate skill of CART on the testing dataset
+
+predictions <- predict(fit.cart, test)
+confusionMatrix(predictions, as.factor(test$Action))
+
+#plot the graph
+
+install.packages("rattle")
+library(rattle)
+fancyRpartPlot(fit.cart$finalModel)
+
