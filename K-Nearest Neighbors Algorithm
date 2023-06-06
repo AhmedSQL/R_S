@@ -1,0 +1,59 @@
+ # Install  the required library 
+
+install.packages("caret")
+install.packages("kernlab ")
+install.packages("e1071")
+
+
+# Load the library
+
+library(caret)
+library(kernlab)
+library(e1071)
+
+#  Load Dataset
+
+log2<- read.csv("C:\Users\Ahmed Hashim\Desktop\log2.csv ")
+
+View(log2)
+
+# create a list of 80% of the rows in the original dataset we can use for training
+
+divide_data <- createDataPartition(log2$Action, p=0.80, list=FALSE)
+# select 20% of the data for validation
+test <- log2[-divide_data,]
+# use the remaining 80% of data to training and testing the models
+train <- log2[divide_data,]
+
+#Build  KNN algorithm/ model using train dataset
+
+set.seed(7)
+fit.knn<- train(Action~., data=train, method='knn')
+
+
+
+# summarize   Model
+
+print(fit.knn)
+
+
+# estimate skill of KNN on the training dataset
+
+predictions <- predict(fit.knn, train)
+confusionMatrix(predictions, as.factor(train$Action))
+
+# estimate skill of KNN on the testing dataset
+
+predictions <- predict(fit.knn, test)
+confusionMatrix(predictions, as.factor(test$Action))
+
+# Create a data frame for plotting
+plot_data <- data.frame(K = k_values, Accuracy = accuracy_values)
+
+# Plot the graph
+ggplot(plot_data, aes(x = K, y = Accuracy)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "K", y = "Accuracy") +
+  ggtitle("K-Nearest Neighbors Algorithm") +
+  theme_minimal()
